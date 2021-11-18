@@ -1,11 +1,11 @@
 library highlighter_coachmark;
 
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/animation.dart';
-
 import 'dart:async';
 import 'dart:ui' as ui;
+
+import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 /// CoachMark blurs background of the whole screen and highlights target element.
 /// It does this in Overlay. So the whole screen is covered by CoachMark's layer.
@@ -47,10 +47,10 @@ class CoachMark {
   CoachMark({this.bgColor = const Color(0xB2212121)});
 
   /// Global key to get an access for CoachMark's State
-  GlobalKey<_HighlighterCoachMarkState> globalKey;
+  GlobalKey<_HighlighterCoachMarkState>? globalKey;
 
   /// Background color
-  Color bgColor;
+  Color? bgColor;
 
   /// State visibility of CoachMark
   bool _isVisible = false;
@@ -59,10 +59,10 @@ class CoachMark {
   bool get isVisible => _isVisible;
 
   /// Called when CoachMark is closed
-  VoidCallback _onClose;
+  VoidCallback? _onClose;
 
   /// Contains OverlayEntry with CoachMark's Widget
-  OverlayEntry _overlayEntryBackground;
+  OverlayEntry? _overlayEntryBackground;
 
   /// Brings out CoachMark's widget with animation on the whole screen
   ///
@@ -84,15 +84,15 @@ class CoachMark {
   ///
   /// Callback [onClose] is called when CoachMark is closed
   void show({
-    @required BuildContext targetContext,
-    @required List<Widget> children,
-    @required Rect markRect,
+    required BuildContext targetContext,
+    required List<Widget> children,
+    required Rect markRect,
     BoxShape markShape = BoxShape.circle,
-    Duration duration,
-    VoidCallback onClose,
-    HitTestBehavior hitTestBehavior,
-    bool closeOnTap,
-    VoidCallback onTransparentSectionTap,
+    Duration? duration,
+    VoidCallback? onClose,
+    HitTestBehavior? hitTestBehavior,
+    bool? closeOnTap,
+    VoidCallback? onTransparentSectionTap,
   }) async {
     // Prevent from showing multiple marks at the same time
     if (_isVisible) {
@@ -108,20 +108,20 @@ class CoachMark {
     _overlayEntryBackground = _overlayEntryBackground ??
         new OverlayEntry(
           builder: (BuildContext context) => new _HighlighterCoachMarkWidget(
-                key: globalKey,
-                bgColor: bgColor,
-                markRect: markRect,
-                markShape: markShape,
-                doClose: close,
-                children: children,
-                hitTestBehavior: hitTestBehavior,
-                closeOnTap: closeOnTap,
-                onTransparentSectionTap: onTransparentSectionTap,
-              ),
+            key: globalKey!,
+            bgColor: bgColor!,
+            markRect: markRect,
+            markShape: markShape,
+            doClose: close,
+            children: children,
+            hitTestBehavior: hitTestBehavior!,
+            closeOnTap: closeOnTap!,
+            onTransparentSectionTap: onTransparentSectionTap!,
+          ),
         );
 
-    OverlayState overlayState = Overlay.of(targetContext);
-    overlayState.insert(_overlayEntryBackground);
+    OverlayState overlayState = Overlay.of(targetContext)!;
+    overlayState.insert(_overlayEntryBackground!);
 
     if (duration != null) {
       await new Future.delayed(duration).then((_) => close());
@@ -132,11 +132,11 @@ class CoachMark {
   Future close() async {
     if (_isVisible) {
       await globalKey?.currentState?.reverse();
-      _overlayEntryBackground.remove();
+      _overlayEntryBackground!.remove();
 
       _isVisible = false;
       if (_onClose != null) {
-        _onClose();
+        _onClose!();
       }
     }
   }
@@ -146,12 +146,12 @@ class CoachMark {
 /// [markRect]
 class _HighlighterCoachMarkWidget extends StatefulWidget {
   _HighlighterCoachMarkWidget({
-    Key key,
-    @required this.markRect,
-    @required this.markShape,
-    @required this.children,
-    @required this.doClose,
-    @required this.bgColor,
+    Key? key,
+    required this.markRect,
+    required this.markShape,
+    required this.children,
+    required this.doClose,
+    required this.bgColor,
     this.hitTestBehavior = HitTestBehavior.translucent,
     this.closeOnTap = true,
     this.onTransparentSectionTap,
@@ -164,7 +164,7 @@ class _HighlighterCoachMarkWidget extends StatefulWidget {
   final Color bgColor;
   final HitTestBehavior hitTestBehavior;
   final bool closeOnTap;
-  final VoidCallback onTransparentSectionTap;
+  final VoidCallback? onTransparentSectionTap;
 
   @override
   _HighlighterCoachMarkState createState() => new _HighlighterCoachMarkState();
@@ -172,9 +172,9 @@ class _HighlighterCoachMarkWidget extends StatefulWidget {
 
 class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _blurAnimation;
-  Animation<double> _opacityAnimation;
+  late AnimationController _controller;
+  late Animation<double> _blurAnimation;
+  late Animation<double> _opacityAnimation;
 
   //Does reverse animation, called when coachMark is closing.
   Future reverse() {
@@ -224,7 +224,7 @@ class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
 
     return AnimatedBuilder(
         animation: _controller,
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return GestureDetector(
             behavior: widget.hitTestBehavior,
             onTap: () {
@@ -232,7 +232,7 @@ class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
                 _onPointer(null);
               }
               if (widget.onTransparentSectionTap != null) {
-                widget.onTransparentSectionTap();
+                widget.onTransparentSectionTap!();
               }
             },
             child: Stack(
@@ -274,8 +274,8 @@ class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
                       painter: _CoachMarkPainter(
                         rect: position,
                         shadow: BoxShadow(
-                            color:
-                                widget.bgColor.withOpacity(_opacityAnimation.value),
+                            color: widget.bgColor
+                                .withOpacity(_opacityAnimation.value),
                             blurRadius: 0.0),
                         clipper: clipper,
                         coachMarkShape: widget.markShape,
@@ -289,7 +289,7 @@ class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
         });
   }
 
-  void _onPointer(PointerEvent p) {
+  void _onPointer(PointerEvent? p) {
     widget.doClose();
   }
 }
@@ -298,14 +298,14 @@ class _HighlighterCoachMarkState extends State<_HighlighterCoachMarkWidget>
 /// overrides a special hitTest
 class _CoachMarkLayer extends Listener {
   const _CoachMarkLayer(
-      {Key key,
+      {Key? key,
       onPointerDown,
       onPointerMove,
       onPointerUp,
       onPointerCancel,
       behavior,
       this.markPosition,
-      Widget child})
+      Widget? child})
       : super(
             key: key,
             onPointerDown: onPointerDown,
@@ -314,7 +314,7 @@ class _CoachMarkLayer extends Listener {
             onPointerCancel: onPointerCancel,
             child: child);
 
-  final Rect markPosition;
+  final Rect? markPosition;
 
   @override
   RenderPointerListener createRenderObject(BuildContext context) {
@@ -324,7 +324,7 @@ class _CoachMarkLayer extends Listener {
       onPointerUp: onPointerUp,
       onPointerCancel: onPointerCancel,
       behavior: behavior,
-      exceptRegion: markPosition,
+      exceptRegion: markPosition!,
     );
   }
 
@@ -350,29 +350,30 @@ class _RenderPointerListenerWithExceptRegion extends RenderPointerListener {
       onPointerMove,
       onPointerUp,
       onPointerCancel,
-      HitTestBehavior behavior,
+      HitTestBehavior? behavior,
       this.exceptRegion,
-      RenderBox child})
+      RenderBox? child})
       : super(
             onPointerDown: onPointerDown,
             onPointerMove: onPointerMove,
             onPointerUp: onPointerUp,
             onPointerCancel: onPointerCancel,
-            behavior: behavior,
-            child: child);
+            behavior: behavior!,
+            child: child!);
 
-  final Rect exceptRegion;
+  final Rect? exceptRegion;
 
   @override
-  bool hitTest(HitTestResult result, {Offset position}) {
+  bool hitTest(HitTestResult result, {Offset? position}) {
     bool hitTarget = false;
-    if (exceptRegion.contains(position)) {
+    if (exceptRegion!.contains(position!)) {
       result.add(new BoxHitTestEntry(this, position));
       return false;
     }
     if (size.contains(position)) {
       hitTarget =
-          hitTestChildren(result, position: position) || hitTestSelf(position);
+          hitTestChildren(result as BoxHitTestResult, position: position) ||
+              hitTestSelf(position);
       if (hitTarget || behavior == HitTestBehavior.translucent)
         result.add(new BoxHitTestEntry(this, position));
     }
@@ -398,15 +399,15 @@ class _CoachMarkClipper extends CustomClipper<Path> {
 ///This class makes edges of hole blurred.
 class _CoachMarkPainter extends CustomPainter {
   _CoachMarkPainter({
-    @required this.rect,
-    @required this.shadow,
+    required this.rect,
+    required this.shadow,
     this.clipper,
     this.coachMarkShape = BoxShape.circle,
   });
 
   final Rect rect;
   final BoxShadow shadow;
-  final _CoachMarkClipper clipper;
+  final _CoachMarkClipper? clipper;
   final BoxShape coachMarkShape;
 
   void paint(Canvas canvas, Size size) {
@@ -419,7 +420,8 @@ class _CoachMarkPainter extends CustomPainter {
     switch (coachMarkShape) {
       case BoxShape.rectangle:
         canvas.drawRRect(
-            RRect.fromRectAndRadius(rect, Radius.circular(circle.width / 14.786)),
+            RRect.fromRectAndRadius(
+                rect, Radius.circular(circle.width / 14.786)),
             paint);
         break;
       case BoxShape.circle:

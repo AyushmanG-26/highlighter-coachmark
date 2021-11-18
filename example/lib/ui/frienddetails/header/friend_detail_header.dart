@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:example/ui/frienddetails/header/diagonally_cut_colored_image.dart';
 import 'package:example/ui/friends/friend.dart';
+import 'package:flutter/material.dart';
 
 class FriendDetailHeader extends StatelessWidget {
   static const BACKGROUND_IMAGE = 'images/profile_header_background.png';
@@ -41,7 +41,7 @@ class FriendDetailHeader extends StatelessWidget {
 
   Widget _buildFollowerInfo(TextTheme textTheme) {
     var followerStyle =
-        textTheme.subhead.copyWith(color: const Color(0xBBFFFFFF));
+        textTheme.subtitle1.copyWith(color: const Color(0xBBFFFFFF));
 
     return new Padding(
       padding: const EdgeInsets.only(top: 16.0),

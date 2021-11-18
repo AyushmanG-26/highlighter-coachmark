@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:example/ui/frienddetails/friend_details_page.dart';
 import 'package:example/ui/friends/friend.dart';
-
+import 'package:flutter/material.dart';
 import 'package:highlighter_coachmark/highlighter_coachmark.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -44,7 +43,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
   Future<void> _loadFriends() async {
     http.Response response =
-        await http.get('https://randomuser.me/api/?results=5');
+        await http.get(Uri(path: 'https://randomuser.me/api/?results=5'));
 
     setState(() {
       _friends = Friend.allFromResponse(response.body);
@@ -205,7 +204,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
   Future<Friend> _loadRandomFriend() async {
     http.Response response =
-        await http.get('https://randomuser.me/api/?results=1');
+        await http.get(Uri(path: 'https://randomuser.me/api/?results=1'));
     var friends = Friend.allFromResponse(response.body);
     return friends.first;
   }
